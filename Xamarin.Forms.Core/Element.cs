@@ -182,13 +182,16 @@ namespace Xamarin.Forms
 				OnPropertyChanging();
 
 				if (RealParent != null)
+				{
 					((IElement)RealParent).RemoveResourcesChangedListener(OnParentResourcesChanged);
+				}
 				RealParent = value;
 				if (RealParent != null)
 				{
 					OnParentResourcesChanged(RealParent.GetMergedResources());
 					((IElement)RealParent).AddResourcesChangedListener(OnParentResourcesChanged);
 				}
+				InheritProperties(RealParent);
 
 				object context = value != null ? value.BindingContext : null;
 				if (value != null)

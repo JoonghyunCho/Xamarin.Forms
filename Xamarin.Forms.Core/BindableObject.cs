@@ -150,6 +150,30 @@ namespace Xamarin.Forms
 			}
 		}
 
+		internal void InheritProperties(BindableObject ancestor)
+		{
+			if (ancestor == null)
+			{
+				foreach (var context in _properties)
+				{
+					if ((context.Attributes & BindableContextAttributes.IsInherited) != 0)
+					{
+						ClearValue(context.Property);
+					}
+				}
+			}
+			else
+			{
+				foreach (var context in ancestor._properties)
+				{
+					if (context.Property.IsInheritable)
+					{
+						SetInheritedValue(context.Property, context.Value);
+					}
+				}
+			}
+		}
+
 		internal bool GetIsBound(BindableProperty targetProperty)
 		{
 			if (targetProperty == null)
@@ -449,9 +473,7 @@ namespace Xamarin.Forms
 			bool same = Equals(original, newValue);
 			if (!same)
 			{
-				if (property.PropertyChanging != null)
-					property.PropertyChanging(this, original, newValue);
-
+				property.PropertyChanging?.Invoke(this, original, newValue);
 				OnPropertyChanging(property.PropertyName);
 			}
 
@@ -462,8 +484,7 @@ namespace Xamarin.Forms
 			if (!same)
 			{
 				OnPropertyChanged(property.PropertyName);
-				if (property.PropertyChanged != null)
-					property.PropertyChanged(this, original, newValue);
+				property.PropertyChanged?.Invoke(this, original, newValue);
 			}
 		}
 
